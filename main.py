@@ -1,18 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
-from utils.client import login
+import utils.client as uc
 
-# import csv
+def main():
+    client = uc.login()
 
-if __name__ == "__main__":
-    client = login()
-
-    print("--- successfully logged in ---")
-
+    # creates list of all releases of the personal user collection
     release_ids = [
         release.id for release in client.identity().collection_folders[0].releases
     ]
 
+    # albums
+    csv_string = "id,title,artist,comment,duration,genre,track,year,album,label\n"
     for id in release_ids:
         release = client.release(id)
 
@@ -24,31 +21,18 @@ if __name__ == "__main__":
 
         tracklist = release.tracklist
 
+        # tracks
         for track in tracklist:
-            print("id: " + str(id))
-            print("title: " + track.title)
-            print("artist: " + artist)
-            # print("comment: \"Vinyl\"")
-            print("duration: " + track.duration)  # todo: to millisec & empty values?
-            # print("bpm: " + bpm)
-            print("genre: " + genre)
-            print("track: " + track.position)
-            print("year: " + year)  # release year
-            print("album: " + album)
-            print("label: " + label)
+            duration = duration_to_ms(duration_raw=track.duration)
+            csv_string += f"{str(id)},{track.title},{artist},Vinyl,{duration},{genre},{track.position},{year},{album},{label}\n"
 
-            print("-------------------------------------")
+    open("tracks.csv", "w").write(csv_string)
 
-# def write_csv(id):
-#     header = ['Titel', 'Artist', 'Genre', 'Track', 'Year', 'Album', 'Duration']
-#     release = get_release(id)
-#     artist = release.artists[0].name
-#     year = release.year
-#     album = release.title
-#     genre = release.genres[0]
-#     with open('../resources/file.csv', 'w', encoding='UTF8') as file:
-#         writer = csv.writer(file)
-#         writer.writerow(header)
-#         for track in release.tracklist:
-#             data = [track.title, artist, genre, track.position, year, album, track.duration]
-#             writer.writerow(data)
+def duration_to_ms(duration_raw:str) -> str:
+    if not duration_raw: return "2000"
+    durations = duration_raw.split(":")
+    ms = int(durations[0]) * 60000 + int(durations[1]) * 1000 
+    return ms if len(durations)==2 else ms + int(durations[2])
+
+if __name__ == "__main__":
+    main()
