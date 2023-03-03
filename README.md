@@ -3,6 +3,14 @@ Uses Discogs-API to collect information from your collection on Discogs.
 
 ## Installation
 
+```sh
+pip install -r packages.txt
+```
+
+```sh
+python main.py
+```
+
 ## Usage
 
 Input: Discogs Token
