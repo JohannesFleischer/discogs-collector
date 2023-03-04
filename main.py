@@ -1,9 +1,8 @@
 import track as t
-import csv
-import os
 
 import discogs_client as dc
-
+import csv
+import os
 
 def main():
     token = input("Paste your token: \n")
@@ -29,7 +28,7 @@ def main():
             "label",
             "genre",
             "title",
-            "position",
+            "position", # TODO if empty -> no write
             "duration",
         ]
         writer.writerow(header)

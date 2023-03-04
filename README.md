@@ -22,17 +22,20 @@ Output: csv of all your tracks from your whole collection with following data
 - Artist
 - Comment ("Vinyl")
 - Duration (millisec)
-- (BPM)
 - Genre
 - Track
 - Year
 - Album
+- Label
+- Date downloaded/created
+
+Need to check: 
+- Date added
 - Language
 - Century
 - Subgenre
 - Discnumber
 - Catalog
-- Label
 - Labelcode
 - Date
 - Media
