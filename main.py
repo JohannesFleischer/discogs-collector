@@ -1,38 +1,66 @@
-import utils.client as uc
+import track as t
+
+import discogs_client as dc
+import csv
+import os
 
 def main():
-    client = uc.login()
+    token = input("Paste your token: \n")
+    client = dc.Client("DiscogsCollector", user_token=token)
 
     # creates list of all releases of the personal user collection
     release_ids = [
         release.id for release in client.identity().collection_folders[0].releases
     ]
 
-    # albums
-    csv_string = "id,title,artist,comment,duration,genre,track,year,album,label\n"
-    for id in release_ids:
-        release = client.release(id)
+    filename = "tracks.csv"
 
-        year = str(release.year)
-        album = release.title
-        artist = release.artists[0].name
-        label = release.labels[0].name
-        genre = release.genres[0]
+    if os.path.exists(filename):
+        os.remove(filename)
 
-        tracklist = release.tracklist
+    with open(filename, "a", encoding="UTF8") as file:
+        writer = csv.writer(file, delimiter=";")
+        header = [
+            "id",
+            "year",
+            "album",
+            "artist",
+            "label",
+            "genre",
+            "title",
+            "position", # TODO if empty -> no write
+            "duration",
+        ]
+        writer.writerow(header)
 
-        # tracks
-        for track in tracklist:
-            duration = duration_to_ms(duration_raw=track.duration)
-            csv_string += f"{str(id)},{track.title},{artist},Vinyl,{duration},{genre},{track.position},{year},{album},{label}\n"
+        # albums
+        for id in release_ids:
+            release = client.release(id)
 
-    open("tracks.csv", "w").write(csv_string)
+            year = str(release.year)
+            album = release.title
+            artist = release.artists[0].name
+            label = release.labels[0].name
+            genre = release.genres[0]
 
-def duration_to_ms(duration_raw:str) -> str:
-    if not duration_raw: return "2000"
-    durations = duration_raw.split(":")
-    ms = int(durations[0]) * 60000 + int(durations[1]) * 1000 
-    return ms if len(durations)==2 else ms + int(durations[2])
+            tracklist = release.tracklist
+
+            # tracks
+            for star_track in tracklist:
+                duration = t.Track.duration_to_ms(star_track, duration_raw=star_track.duration)
+                track = t.Track(
+                    id,
+                    year,
+                    album,
+                    artist,
+                    label,
+                    genre,
+                    star_track.title,
+                    star_track.position,
+                    duration,
+                )
+                writer.writerow(t.Track.get_values(track))
+
 
 if __name__ == "__main__":
     main()
