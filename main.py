@@ -1,6 +1,6 @@
-import utils.utils as utils
-import utils.track as t
+import track as t
 import csv
+import os
 
 import discogs_client as dc
 
@@ -14,7 +14,12 @@ def main():
         release.id for release in client.identity().collection_folders[0].releases
     ]
 
-    with open("tracks.csv", "a", encoding="UTF8") as file:
+    filename = "tracks.csv"
+
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    with open(filename, "a", encoding="UTF8") as file:
         writer = csv.writer(file, delimiter=";")
         header = [
             "id",
