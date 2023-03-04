@@ -30,5 +30,5 @@ class Track:
             header.append(str(key))
         return header
 
-    def get_values(self, keys) -> str:
-        return [self.__dict__[key] for key in keys]
+    def get_values(self) -> str:
+        return [self.__dict__[key] for key in self.get_header()]

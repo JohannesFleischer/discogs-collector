@@ -14,32 +14,48 @@ def main():
         release.id for release in client.identity().collection_folders[0].releases
     ]
 
+    with open("tracks.csv", "a", encoding="UTF8") as file:
+        writer = csv.writer(file, delimiter=";")
+        header = [
+            "id",
+            "year",
+            "album",
+            "artist",
+            "label",
+            "genre",
+            "title",
+            "position",
+            "duration",
+        ]
+        writer.writerow(header)
 
-    # FIXME
-    # with open("test.csv", "w", encoding="UTF8") as file:
-    #     writer = csv.writer(file, delimiter=';')
-    #     writer.writerow(header)
+        # albums
+        for id in release_ids:
+            release = client.release(id)
 
-    #     # albums
-    #     for id in release_ids:
-    #         release = client.release(id)
+            year = str(release.year)
+            album = release.title
+            artist = release.artists[0].name
+            label = release.labels[0].name
+            genre = release.genres[0]
 
-    #         year = str(release.year)
-    #         album = release.title
-    #         artist = release.artists[0].name
-    #         label = release.labels[0].name
-    #         genre = release.genres[0]
+            tracklist = release.tracklist
 
-    #         tracklist = release.tracklist
-
-    #         # tracks
-            
-    #         duration = t.Track.duration_to_ms(duration_raw=star_track.duration)
-    #         track = t.Track(id, year, album, artist, label, genre, star_track.title, star_track.position, duration)
-    #         header = t.Track.get_header(track)
-    #         for star_track in tracklist:
-    #             duration = t.Track.duration_to_ms(duration_raw=star_track.duration)
-    #             writer.writerow(t.Track.get_values(track, header))
+            # tracks
+            for star_track in tracklist:
+                duration = t.Track.duration_to_ms(star_track, duration_raw=star_track.duration)
+                track = t.Track(
+                    id,
+                    year,
+                    album,
+                    artist,
+                    label,
+                    genre,
+                    star_track.title,
+                    star_track.position,
+                    duration,
+                )
+                writer.writerow(t.Track.get_values(track))
 
 
 if __name__ == "__main__":
